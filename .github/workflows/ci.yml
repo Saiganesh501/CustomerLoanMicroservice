@@ -15,5 +15,14 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Build with Maven
+      - name: Build Customer Service
+        working-directory: ExampleCustomerService
+        run: mvn clean package
+
+      - name: Build Loan Service
+        working-directory: ExampleLoanService
+        run: mvn clean package
+
+      - name: Build Eureka Server
+        working-directory: ExampleEurekaServer
         run: mvn clean package
