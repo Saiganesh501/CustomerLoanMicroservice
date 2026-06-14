@@ -1,0 +1,22 @@
+services:
+
+  eureka-server:
+    image: eureka-server
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+
+  loan-service:
+    image: loan-service
+    container_name: loan-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - eureka-server
+  customer-service:
+    image: customer-service
+    container_name: customer-service
+    ports:
+      - "8080:8080"
+    depends_on:
+      [ eureka-server, loan-service ]
