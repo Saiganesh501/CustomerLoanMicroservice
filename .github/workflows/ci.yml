@@ -2,6 +2,7 @@ name: Java CI
 
 on:
   push:
+    - story/501
 
 jobs:
   build:
