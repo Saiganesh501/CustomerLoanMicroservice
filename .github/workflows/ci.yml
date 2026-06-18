@@ -1,19 +1,24 @@
-name: Java CI
+name: Java CI/CD
 
 on:
   push:
     branches:
       - story/501
 
+env:
+  CUSTOMER_IMAGE: gani14/customer-service
+  LOAN_IMAGE: gani14/loan-service
+  EUREKA_IMAGE: gani14/eureka-server
+
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set up Java
+      - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -21,12 +26,45 @@ jobs:
 
       - name: Build Customer Service
         working-directory: ExampleCustomerService
-        run: mvn clean package
+        run: mvn clean package -DskipTests
 
       - name: Build Loan Service
         working-directory: ExampleLoanService
-        run: mvn clean package
+        run: mvn clean package -DskipTests
 
       - name: Build Eureka Server
         working-directory: ExampleEurekaServer
-        run: mvn clean package
+        run: mvn clean package -DskipTests
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.gani14 }}
+          password: ${{ secrets.Ganesh14s@ndhya }}
+
+      - name: Build Customer Image
+        run: |
+          docker build -t $CUSTOMER_IMAGE:${{ github.sha }} -t $CUSTOMER_IMAGE:latest ./ExampleCustomerService
+
+      - name: Push Customer Image
+        run: |
+          docker push $CUSTOMER_IMAGE:${{ github.sha }}
+          docker push $CUSTOMER_IMAGE:latest
+
+      - name: Build Loan Image
+        run: |
+          docker build -t $LOAN_IMAGE:${{ github.sha }} -t $LOAN_IMAGE:latest ./ExampleLoanService
+
+      - name: Push Loan Image
+        run: |
+          docker push $LOAN_IMAGE:${{ github.sha }}
+          docker push $LOAN_IMAGE:latest
+
+      - name: Build Eureka Image
+        run: |
+          docker build -t $EUREKA_IMAGE:${{ github.sha }} -t $EUREKA_IMAGE:latest ./ExampleEurekaServer
+
+      - name: Push Eureka Image
+        run: |
+          docker push $EUREKA_IMAGE:${{ github.sha }}
+          docker push $EUREKA_IMAGE:latest
